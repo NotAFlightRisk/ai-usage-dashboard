@@ -12,6 +12,7 @@ const now = Date.UTC(2026, 8, 9, 12, 0, 0);
 
 let handle: DatabaseSync;
 let usage: typeof import('../src/lib/server/queries').usage;
+let localDay: typeof import('../src/lib/server/scan').localDay;
 
 const add = (
   id: string,
@@ -20,13 +21,26 @@ const add = (
   project: string,
   daysAgo: number,
   tokens: number
-) =>
+) => {
+  const at = new Date(now - daysAgo * DAY);
   handle
     .prepare(
-      'insert into events (id, tool, model, session, project, ts, input, output, cache_read,' +
-        ' cache_write, reasoning) values (?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0)'
+      'insert into events (id, tool, model, session, project, ts, day, dow, hour, input, output,' +
+        ' cache_read, cache_write, reasoning) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0)'
     )
-    .run(id, tool, model, `session-${id}`, project, now - daysAgo * DAY, tokens);
+    .run(
+      id,
+      tool,
+      model,
+      `session-${id}`,
+      project,
+      at.getTime(),
+      localDay(at),
+      at.getDay(),
+      at.getHours(),
+      tokens
+    );
+};
 
 const filters = (over: Partial<Filters> = {}): Filters => ({
   from: now - 7 * DAY,
@@ -41,6 +55,7 @@ const filters = (over: Partial<Filters> = {}): Filters => ({
 beforeAll(async () => {
   handle = (await import('../src/lib/server/db')).db();
   ({ usage } = await import('../src/lib/server/queries'));
+  ({ localDay } = await import('../src/lib/server/scan'));
 
   add('a', 'claude-code', 'claude-opus-5', '/work/one', 1, 1_000_000);
   add('b', 'claude-code', 'claude-opus-5', '/work/two', 2, 2_000_000);

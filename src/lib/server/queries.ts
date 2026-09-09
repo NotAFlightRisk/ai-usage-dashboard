@@ -9,7 +9,6 @@ type Row = Record<string, string | number | null>;
 
 const empty = (): Tokens => ({ input: 0, output: 0, cache_read: 0, cache_write: 0 });
 
-const DAY = "date(ts / 1000, 'unixepoch', 'localtime')";
 
 function where(filters: Filters, dated = true) {
   const clauses: string[] = [];
@@ -108,7 +107,7 @@ function series(filters: Filters, column: string, overrides: Record<string, Rate
   const clause = where(filters);
   const rows = db()
     .prepare(
-      `select ${DAY} day, ${column} key, model, ${SUMS} from events ${clause.sql}` +
+      `select day, ${column} key, model, ${SUMS} from events ${clause.sql}` +
         ` group by day, ${column}, model order by day`
     )
     .all(...clause.params) as Row[];
@@ -142,7 +141,7 @@ function calendar(filters: Filters, overrides: Record<string, Rate>) {
   const clause = where(filters, false);
   const rows = db()
     .prepare(
-      `select ${DAY} day, model, ${SUMS} from events ${clause.sql} group by day, model order by day`
+      `select day, model, ${SUMS} from events ${clause.sql} group by day, model order by day`
     )
     .all(...clause.params) as Row[];
 
@@ -173,10 +172,8 @@ function clock(filters: Filters) {
   const clause = where(filters);
   const rows = db()
     .prepare(
-      "select cast(strftime('%w', ts / 1000, 'unixepoch', 'localtime') as integer) day," +
-        " cast(strftime('%H', ts / 1000, 'unixepoch', 'localtime') as integer) hour," +
-        ' sum(input + output + cache_read + cache_write) total from events' +
-        ` ${clause.sql} group by day, hour`
+      'select dow day, hour, sum(input + output + cache_read + cache_write) total' +
+        ` from events ${clause.sql} group by dow, hour`
     )
     .all(...clause.params) as Row[];
   return rows.map((row) => ({
@@ -237,7 +234,27 @@ const distinct = (column: string) =>
     .map((row) => String(row.value))
     .filter(Boolean);
 
+const memo = new Map<string, Usage>();
+let memoFor = -1;
+
+/** One rollup per filter set per scan, since nothing under it can move in between. */
 export function usage(filters: Filters): Usage {
+  const { scannedAt } = scanState();
+  if (scannedAt !== memoFor || memo.size > 32) {
+    memo.clear();
+    memoFor = scannedAt;
+  }
+
+  const key = JSON.stringify(filters);
+  const hit = memo.get(key);
+  if (hit) return { ...hit, problems: problems() };
+
+  const fresh = rollup(filters);
+  memo.set(key, fresh);
+  return fresh;
+}
+
+function rollup(filters: Filters): Usage {
   const overrides = priceOverrides();
   const span = filters.to - filters.from;
   const previous = { ...filters, from: filters.from - span, to: filters.from };

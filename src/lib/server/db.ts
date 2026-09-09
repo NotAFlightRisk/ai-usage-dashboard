@@ -4,7 +4,9 @@ import { dirname } from 'node:path';
 import { config } from './config';
 
 /** Bump to throw away scanned rows and read every source file again. */
-const SCHEMA = 1;
+const SCHEMA = 2;
+
+const META = 'create table if not exists meta (key text primary key, value text not null)';
 
 const TABLES = `
 create table if not exists events (
@@ -14,6 +16,9 @@ create table if not exists events (
   session text not null,
   project text not null,
   ts integer not null,
+  day text not null,
+  dow integer not null,
+  hour integer not null,
   input integer not null default 0,
   output integer not null default 0,
   cache_read integer not null default 0,
@@ -21,6 +26,7 @@ create table if not exists events (
   reasoning integer not null default 0
 );
 create index if not exists events_ts on events (ts);
+create index if not exists events_day on events (day);
 create table if not exists files (
   path text primary key,
   tool text not null,
@@ -39,7 +45,6 @@ create table if not exists windows (
   detail text not null default '',
   seen_at integer not null
 );
-create table if not exists meta (key text primary key, value text not null);
 `;
 
 let handle: DatabaseSync | null = null;
@@ -51,13 +56,14 @@ export function db(): DatabaseSync {
   handle = new DatabaseSync(config.dbPath);
   handle.exec('pragma journal_mode = wal');
   handle.exec('pragma synchronous = normal');
-  handle.exec(TABLES);
+  handle.exec(META);
 
+  // the scanned tables go before they are recreated, or the new indexes hit the old columns
   if (readMeta('schema') !== String(SCHEMA)) {
     handle.exec('drop table if exists events; drop table if exists files');
-    handle.exec(TABLES);
     writeMeta('schema', String(SCHEMA));
   }
+  handle.exec(TABLES);
   return handle;
 }
 

@@ -15,7 +15,8 @@ export const rangeLabel = (id: string) =>
 /** Whole local days, so the daily charts and the totals above them agree. */
 export function resolveRange(id: string, now = Date.now()) {
   const range = RANGES.find((entry) => entry.id === id) ?? RANGES[2];
-  const to = now;
+  // rounded up to the minute, so repeat requests share one cached rollup
+  const to = Math.ceil(now / 60_000) * 60_000;
   if (!range.days) return { from: 0, to, range: range.id };
 
   const start = new Date(now);

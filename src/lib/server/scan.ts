@@ -26,8 +26,8 @@ async function listFiles(source: Source): Promise<string[]> {
 }
 
 const INSERT =
-  'insert into events (id, tool, model, session, project, ts, input, output, cache_read,' +
-  ' cache_write, reasoning) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' +
+  'insert into events (id, tool, model, session, project, ts, day, dow, hour, input, output,' +
+  ' cache_read, cache_write, reasoning) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' +
   ' on conflict(id) do update set input = max(input, excluded.input),' +
   ' output = max(output, excluded.output), cache_read = max(cache_read, excluded.cache_read),' +
   ' cache_write = max(cache_write, excluded.cache_write),' +
@@ -98,6 +98,7 @@ async function scanSource(source: Source): Promise<SourceStat> {
       const parsed = source.parse(path, await readFile(path, 'utf8'));
       handle.exec('begin');
       for (const event of parsed.events) {
+        const at = new Date(event.ts);
         insert.run(
           event.id,
           source.id,
@@ -105,6 +106,9 @@ async function scanSource(source: Source): Promise<SourceStat> {
           event.session,
           event.project,
           event.ts,
+          localDay(at),
+          at.getDay(),
+          at.getHours(),
           event.input,
           event.output,
           event.cache_read,
@@ -160,6 +164,12 @@ async function scanSource(source: Source): Promise<SourceStat> {
   }
   return state;
 }
+
+const pad = (value: number) => String(value).padStart(2, '0');
+
+/** Local, not UTC, so a day on the calendar is the day the user had. */
+export const localDay = (at: Date) =>
+  `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}`;
 
 async function lstatOf(path: string) {
   const info = await stat(path);
