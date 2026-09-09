@@ -1,0 +1,16 @@
+[Unit]
+Description=AI usage dashboard
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=__DIR__
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=__PORT__
+ExecStart=__NODE__ __DIR__/bin/ai-usage-dashboard.js --no-open
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,52 @@
+{
+  "name": "ai-usage-dashboard",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "node bin/ai-usage-dashboard.js",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "^2.63.0",
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@types/node": "^26.5.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-svelte": "^4.1.1",
+    "svelte": "^5.56.1",
+    "svelte-check": "^4.6.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^5.0.0"
+  },
+  "dependencies": {
+    "@sveltejs/adapter-node": "^5.5.7"
+  },
+  "description": "One command, one page: every token your AI coding tools have spent",
+  "license": "MIT",
+  "bin": {
+    "ai-usage-dashboard": "bin/ai-usage-dashboard.js"
+  },
+  "files": [
+    "bin",
+    "build",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": "^22.12.0 || >=24.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NotAFlightRisk/ai-usage-dashboard.git"
+  },
+  "overrides": {
+    "cookie": "^0.7.0"
+  }
+}
