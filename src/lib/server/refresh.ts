@@ -1,6 +1,8 @@
 import { scan } from './scan';
 import { refreshClaudeWindows } from './windows';
 import { settings } from './settings';
+import { usage } from './queries';
+import { resolveRange } from '../range';
 import { describe, report } from './problems';
 
 let timer: NodeJS.Timeout | null = null;
@@ -18,6 +20,13 @@ export async function refresh(force = false): Promise<void> {
     ),
     refreshClaudeWindows(force)
   ]);
+  warm();
+}
+
+/** Pay for the first rollup here, not on the next visitor's page load. */
+function warm(): void {
+  const { from, to, range } = resolveRange(settings().range);
+  usage({ from, to, range, tools: [], models: [], projects: [] });
 }
 
 export function boot(): void {
