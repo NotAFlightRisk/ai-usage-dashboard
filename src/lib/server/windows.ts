@@ -16,6 +16,10 @@ const LABELS: Record<string, [string, number]> = {
 
 type Window = { used_percentage?: number; utilization?: number; resets_at?: string | number };
 
+const EVERY = 10 * 60_000;
+const AFTER_429 = 30 * 60_000;
+let nextAt = 0;
+
 const percent = (window: Window) => window.used_percentage ?? window.utilization;
 
 function resets(window: Window): number | null {
@@ -37,11 +41,13 @@ async function token(): Promise<string> {
 }
 
 /**
- * Subscription windows straight from the account, which is the only place they exist. Reads the
- * local Claude Code credentials to ask, so it is a setting rather than an always-on.
+ * Subscription windows straight from the account, which is the only place they exist. Asked for
+ * far less often than the scan runs, since the endpoint rate-limits and the numbers barely move.
  */
-export async function refreshClaudeWindows(): Promise<void> {
+export async function refreshClaudeWindows(force = false): Promise<void> {
   if (!settings().claudeWindows) return;
+  if (!force && Date.now() < nextAt) return;
+  nextAt = Date.now() + EVERY;
 
   try {
     const response = await fetch(ENDPOINT, {
@@ -82,12 +88,18 @@ export async function refreshClaudeWindows(): Promise<void> {
     if (!found) throw new Error('the usage endpoint returned no windows we recognise');
     resolve('windows:claude');
   } catch (error) {
+    const limited = describe(error).includes('429');
+    if (limited) nextAt = Date.now() + AFTER_429;
     report({
       id: 'windows:claude',
       level: 'info',
       scope: 'Claude',
-      message: 'Could not read your 5-hour and 7-day windows',
-      hint: `${describe(error)}. Sign in with Claude Code, or turn the check off in settings.`
+      message: limited
+        ? 'Anthropic is rate limiting the windows check'
+        : 'Could not read your 5-hour and 7-day windows',
+      hint: limited
+        ? 'Trying again in half an hour. Anything shown is the last good read.'
+        : `${describe(error)}. Sign in with Claude Code, or turn the check off in settings.`
     });
   }
 }

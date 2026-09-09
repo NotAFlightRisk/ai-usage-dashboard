@@ -9,7 +9,6 @@ type Row = Record<string, string | number | null>;
 
 const empty = (): Tokens => ({ input: 0, output: 0, cache_read: 0, cache_write: 0 });
 
-
 function where(filters: Filters, dated = true) {
   const clauses: string[] = [];
   const params: (string | number)[] = [];
@@ -33,7 +32,7 @@ function where(filters: Filters, dated = true) {
 const SUMS =
   'sum(input) input, sum(output) output, sum(cache_read) cache_read,' +
   ' sum(cache_write) cache_write, sum(reasoning) reasoning, count(*) events,' +
-  ' count(distinct session) sessions';
+  " count(distinct tool || ':' || session) sessions";
 
 /** Rows arrive split by model so each slice can be priced at its own rate. */
 function fold(rows: Row[], overrides: Record<string, Rate>): Map<string, Slice> {
@@ -97,7 +96,7 @@ function totals(filters: Filters, overrides: Record<string, Rate>): Slice {
   const slice = fold(rows, overrides).get('') ?? blank('');
 
   const distinct = db()
-    .prepare(`select count(distinct session) sessions from events ${clause.sql}`)
+    .prepare(`select count(distinct tool || ':' || session) sessions from events ${clause.sql}`)
     .get(...clause.params) as Row;
   slice.sessions = Number(distinct?.sessions) || 0;
   return slice;
@@ -197,7 +196,8 @@ function sessions(filters: Filters, overrides: Record<string, Rate>, limit = 60)
   const merged = new Map<string, Merged>();
   for (const row of rows) {
     const id = String(row.key);
-    const entry: Merged = merged.get(id) ?? {
+    const at = `${row.tool}:${id}`;
+    const entry: Merged = merged.get(at) ?? {
       id,
       tool: String(row.tool),
       project: String(row.project),
@@ -220,7 +220,7 @@ function sessions(filters: Filters, overrides: Record<string, Rate>, limit = 60)
     const cost = costOf(String(row.model), tokens, overrides);
     if (cost === null) entry.cost = null;
     else if (entry.cost !== null) entry.cost += cost;
-    merged.set(id, entry);
+    merged.set(at, entry);
   }
 
   return [...merged.values()]
@@ -238,6 +238,8 @@ const memo = new Map<string, Usage>();
 let memoFor = -1;
 
 /** One rollup per filter set per scan, since nothing under it can move in between. */
+export const clearUsageMemo = () => memo.clear();
+
 export function usage(filters: Filters): Usage {
   const { scannedAt } = scanState();
   if (scannedAt !== memoFor || memo.size > 32) {

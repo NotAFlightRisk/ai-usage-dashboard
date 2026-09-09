@@ -5,6 +5,6 @@ import { usage } from '$lib/server/queries';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ url }) => {
-  await refresh();
+  await refresh(true);
   return json(usage(filtersFrom(url)));
 };

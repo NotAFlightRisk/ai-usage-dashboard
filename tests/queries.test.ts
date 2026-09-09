@@ -20,7 +20,8 @@ const add = (
   model: string,
   project: string,
   daysAgo: number,
-  tokens: number
+  tokens: number,
+  session = `session-${id}`
 ) => {
   const at = new Date(now - daysAgo * DAY);
   handle
@@ -32,7 +33,7 @@ const add = (
       id,
       tool,
       model,
-      `session-${id}`,
+      session,
       project,
       at.getTime(),
       localDay(at),
@@ -96,6 +97,15 @@ describe('usage', () => {
     const result = usage(filters());
     const inCalendar = result.calendar.reduce((sum, day) => sum + day.total, 0);
     expect(inCalendar).toBe(31_000_000);
+  });
+
+  it('does not fold two tools into one session when neither wrote a session id', () => {
+    add('blank-a', 'claude-code', 'claude-opus-5', '/work/one', 1, 5, '');
+    add('blank-b', 'codex', 'gpt-5.6-sol', '/work/one', 1, 5, '');
+
+    const result = usage(filters({ projects: ['/work/one'] }));
+    expect(result.sessions.filter((row) => row.id === '')).toHaveLength(2);
+    expect(result.totals.sessions).toBe(5);
   });
 
   it('keeps the project filter on the calendar', () => {

@@ -5,7 +5,7 @@ import { describe, report } from './problems';
 
 let timer: NodeJS.Timeout | null = null;
 
-export async function refresh(): Promise<void> {
+export async function refresh(force = false): Promise<void> {
   await Promise.all([
     scan().catch((error) =>
       report({
@@ -16,7 +16,7 @@ export async function refresh(): Promise<void> {
         hint: describe(error)
       })
     ),
-    refreshClaudeWindows()
+    refreshClaudeWindows(force)
   ]);
 }
 

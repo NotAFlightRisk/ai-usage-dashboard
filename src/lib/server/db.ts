@@ -64,7 +64,23 @@ export function db(): DatabaseSync {
     writeMeta('schema', String(SCHEMA));
   }
   handle.exec(TABLES);
+  rebucket(handle);
   return handle;
+}
+
+const REBUCKET = `
+update events set
+  day = date(ts / 1000, 'unixepoch', 'localtime'),
+  dow = cast(strftime('%w', ts / 1000, 'unixepoch', 'localtime') as integer),
+  hour = cast(strftime('%H', ts / 1000, 'unixepoch', 'localtime') as integer)
+`;
+
+/** Move the machine and every stored day is an hour or a date out, so redo them once. */
+function rebucket(handle: DatabaseSync): void {
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown';
+  if (readMeta('timezone') === zone) return;
+  handle.exec(REBUCKET);
+  writeMeta('timezone', zone);
 }
 
 export function readMeta(key: string): string | null {

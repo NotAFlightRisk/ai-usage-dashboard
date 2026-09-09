@@ -185,7 +185,10 @@ async function run(): Promise<SourceStat[]> {
   return stats;
 }
 
-/** One scan at a time; a caller arriving mid-scan waits on the one already going. */
+/**
+ * One scan at a time; a caller arriving mid-scan waits on the one already going. Rows are never
+ * removed when their file goes: outliving the tools' own pruning is what the database is for.
+ */
 export function scan(): Promise<SourceStat[]> {
   if (!running) running = run().finally(() => (running = null));
   return running;

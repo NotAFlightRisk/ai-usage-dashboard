@@ -1,0 +1,13 @@
+services:
+  ai-usage-dashboard:
+    image: notaflightrisk/ai-usage-dashboard:latest
+    ports:
+      - '8080:8080'
+    volumes:
+      - ${HOME}/.claude:/home/node/.claude:ro
+      - ${HOME}/.codex:/home/node/.codex:ro
+      - ai-usage:/data
+    restart: unless-stopped
+
+volumes:
+  ai-usage:

@@ -61,12 +61,16 @@ The image is on DockerHub ([`notaflightrisk/ai-usage-dashboard`](https://hub.doc
 and GHCR. Mount the directories you want read, plus somehwere to keep the database:
 
 ```shell
-docker run -p 8080:8080 \
+docker run -p 127.0.0.1:8080:8080 \
   -v ~/.claude:/home/node/.claude:ro \
   -v ~/.codex:/home/node/.codex:ro \
   -v ai-usage:/data \
   notaflightrisk/ai-usage-dashboard
 ```
+
+There's a compose file in [`docker/`](../docker/compose.yaml) if you'd rather. The container has
+to bind `0.0.0.0` internally, so publish the port to localhost like that unless something in
+front of it is checking who's asking.
 
 ### Option 2: A local service
 

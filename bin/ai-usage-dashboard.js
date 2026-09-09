@@ -51,6 +51,11 @@ const wanted = Number(value('-p', '--port') ?? process.env.PORT ?? 4747);
 const dbPath = value('--db');
 if (dbPath) process.env.AIUSAGE_DB = dbPath;
 
+if (!Number.isInteger(wanted) || wanted < 1 || wanted > 65535) {
+  console.error(`${value('-p', '--port')} is not a port. Pick a number between 1 and 65535.`);
+  process.exit(1);
+}
+
 const free = (port) =>
   new Promise((done) => {
     const probe = createServer()
@@ -60,13 +65,18 @@ const free = (port) =>
   });
 
 let port = wanted;
-while (port < wanted + 20 && !(await free(port))) port += 1;
+while (port <= Math.min(65535, wanted + 20) && !(await free(port))) port += 1;
+if (port > Math.min(65535, wanted + 20)) {
+  console.error(`Nothing free between ${wanted} and ${port - 1}. Try another with --port.`);
+  process.exit(1);
+}
 if (port !== wanted) console.log(`Port ${wanted} was busy, using ${port}`);
 
 process.env.HOST = host;
 process.env.PORT = String(port);
 
-const url = `http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`;
+const shown = host === '0.0.0.0' || host === '::' ? 'localhost' : host;
+const url = `http://${shown.includes(':') ? `[${shown}]` : shown}:${port}`;
 await import(resolve(root, 'build', 'index.js'));
 console.log(`\n  AI usage dashboard is on ${url}\n`);
 

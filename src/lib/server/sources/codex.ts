@@ -1,4 +1,4 @@
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { config } from '../config';
 import { jsonLines, num, type Event, type Parsed, type Source, type Window } from './types';
 
@@ -25,8 +25,9 @@ function window(id: string, limit: Limit | undefined, plan: string, seenAt: numb
 }
 
 /**
- * Keyed on the running cumulative total, which is what dedupes the identical `token_count`
- * Codex sometimes writes again at the end of a rollout.
+ * Keyed on the rollout plus its running cumulative total. The total dedupes the identical
+ * `token_count` Codex writes again at the end of a rollout; the rollout keeps a resumed session
+ * that restarts its counter from colliding with the original.
  */
 export const codex: Source = {
   id: 'codex',
@@ -37,6 +38,7 @@ export const codex: Source = {
   parse(path, text): Parsed {
     const events: Event[] = [];
     let windows: Window[] = [];
+    const rollout = basename(path, '.jsonl');
     let session = '';
     let project = '';
     let model = 'unknown';
@@ -65,9 +67,9 @@ export const codex: Source = {
       if (Number.isNaN(ts)) continue;
 
       events.push({
-        id: `codex:${session}:${num(running.total_tokens)}`,
+        id: `codex:${rollout}:${num(running.total_tokens)}`,
         model,
-        session,
+        session: session || rollout,
         project,
         ts,
         input: Math.max(0, num(turn.input_tokens) - num(turn.cached_input_tokens)),

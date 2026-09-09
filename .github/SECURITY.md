@@ -14,7 +14,9 @@ Our version history is liniar, and we use semantic versioning. Only the latest r
 
 There's no login. It serves whatever it can read - session ids, working directory names, model
 names, the paths it reads from - to anyone who can reach the port. That's fine on the setup it
-ships with (`HOST=127.0.0.1`), and not fine on a LAN interface or anything public.
+ships with (`HOST=127.0.0.1`), and not fine on a LAN interface or anything public. The container
+binds `0.0.0.0` because it has to, so only publish that port to localhost or put it behind
+something that asks who you are.
 
 Source files are only ever read, never written. The one credential it can touch is the Claude Code
 OAuth token, and only while the plan windows setting is on: it goes to Anthropic and nowhere else,

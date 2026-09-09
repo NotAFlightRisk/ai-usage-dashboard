@@ -135,3 +135,23 @@ describe('the Codex reader', () => {
     });
   });
 });
+
+describe('event identity across files', () => {
+  it('will not merge two rollouts that both restart their running total', () => {
+    const text = rollout([[10, 2]]);
+    const first = codex.parse('/s/rollout-2026-09-08T09-00-00-abc.jsonl', text);
+    const second = codex.parse('/s/rollout-2026-09-08T11-00-00-def.jsonl', text);
+
+    expect(first.events[0].id).not.toBe(second.events[0].id);
+  });
+
+  it('falls back to the rollout name when a file has lost its session header', () => {
+    const text = rollout([[10, 2]])
+      .split('\n')
+      .filter((line) => !line.includes('session_meta'))
+      .join('\n');
+    const { events } = codex.parse('/s/rollout-2026-09-08T09-00-00-abc.jsonl', text);
+
+    expect(events[0].session).toBe('rollout-2026-09-08T09-00-00-abc');
+  });
+});
