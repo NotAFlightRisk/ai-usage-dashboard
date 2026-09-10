@@ -33,6 +33,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Match the version to the tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: npm version "$TAG" --no-git-tag-version --allow-same-version
       - name: Pack the server
         env:
           TAG: ${{ inputs.tag }}

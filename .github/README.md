@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <img src="./screenshot.png" width="800" alt="The dashboard, showing a usage calendar, daily totals and plan windows" />
+  <img src="https://raw.githubusercontent.com/NotAFlightRisk/ai-usage-dashboard/main/.github/screenshot.png" width="800" alt="The dashboard, showing a usage calendar, daily totals and plan windows" />
 </p>
 
 ---
@@ -68,7 +68,7 @@ docker run -p 127.0.0.1:8080:8080 \
   notaflightrisk/ai-usage-dashboard
 ```
 
-There's a compose file in [`docker/`](../docker/compose.yaml) if you'd rather. The container has
+There's a compose file in [`docker/`](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/docker/compose.yaml) if you'd rather. The container has
 to bind `0.0.0.0` internally, so publish the port to localhost like that unless something in
 front of it is checking who's asking.
 
@@ -101,7 +101,7 @@ Most of it lives behind the gear icon: theme, default range, how often to rescan
 Anthropic for your plan windows, and price overrides for any model we've got wrong or don't know.
 
 Paths are environment variables, since they're needed before the app starts. See
-[`.env.example`](../.env.example) for the full list. The ones you'll actually want are
+[`.env.example`](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/.env.example) for the full list. The ones you'll actually want are
 `AIUSAGE_DB`, `AIUSAGE_CLAUDE_DIR` and `AIUSAGE_CODEX_DIR`.
 
 ---
@@ -122,8 +122,8 @@ we can read, it can go in - open an issue with a sample and we'll have a look.
 ## Development
 
 You'll need [Node](https://nodejs.org/) 22.12 or newer (that's where `node:sqlite` lands), plus
-[Git](https://git-scm.com/). It's a [SvelteKit](https://svelte.dev/docs/kit) app with no runtime
-dependencies beyond the Node adapter, so there's nothing else to install.
+[Git](https://git-scm.com/). It's a [SvelteKit](https://svelte.dev/docs/kit) app and the build
+comes out self-contained, so an install of it pulls in no runtime dependencies at all.
 
 ```bash
 git clone git@github.com:NotAFlightRisk/ai-usage-dashboard.git
@@ -145,6 +145,6 @@ dropped. The marks themselves belong to their owners and are only used to point 
 <p  align="center">
   <a href="https://github.com/NotAFlightRisk"><img width="64" src="https://pixelflare.cc/iain/gif/penguin-dance.gif" /></a><br>
   <sup>
-    <i>Licensed under <a href="../LICENSE">MIT</a>, © <a href="https://peng.ly">NotAFlightRisk</a> 2026</i>
+    <i>Licensed under <a href="https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/LICENSE">MIT</a>, © <a href="https://peng.ly">NotAFlightRisk</a> 2026</i>
   </sup>
 </p>
