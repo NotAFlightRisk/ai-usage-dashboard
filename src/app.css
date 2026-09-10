@@ -178,6 +178,29 @@ a {
   font-feature-settings: 'tnum';
 }
 
+.app-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  max-width: 260px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  color: var(--text);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--quick);
+}
+
+.app-tooltip.is-open {
+  opacity: 1;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
