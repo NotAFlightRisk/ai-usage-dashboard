@@ -8,7 +8,7 @@ on:
         required: true
     secrets:
       NPM_TOKEN:
-        required: true
+        required: false
   workflow_dispatch:
     inputs:
       tag:
@@ -49,5 +49,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           TAG: ${{ inputs.tag }}
         run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "No NPM_TOKEN, so nothing was published" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           npm publish --provenance --access public
           echo "Published aiusage@$TAG" >> "$GITHUB_STEP_SUMMARY"
