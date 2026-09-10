@@ -17,7 +17,7 @@
 
   const peak = $derived(Math.max(1, ...grid.values()));
 
-  /** Punch card: area scales with the total, so the radius goes as the square root. */
+  /** Punch card: radius goes as the square root, off a floor so a quiet hour still shows. */
   const dot = (value: number) => (value ? 0.32 + 0.68 * Math.sqrt(value / peak) : 0);
 </script>
 
