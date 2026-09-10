@@ -26,9 +26,9 @@ This reads those files, keeps a copy in a small SQLite database, and draws the l
 
 The database matters more than it sounds like it should. Claude Code prunes its transcripts after
 a week or two, so anything not copied out is gone. Once this has been running a while its history
-goes back futher than the files do.
+goes back further than the files do.
 
-Cost is an estimate at published API rates. If you're on a subscription thats a weight rather
+Cost is an estimate at published API rates. If you're on a subscription that's a weight rather
 than a bill, and the plan windows are the thing really constraining you. A model we have no
 price for is reported as unpriced, never quietly counted as free.
 
@@ -37,7 +37,7 @@ price for is reported as unpriced, never quietly counted as free.
 ## Usage
 
 ```shell
-npx ai-usage-dashboard
+npx aiusage
 ```
 
 That's it. It finds your transcripts, reads them, and opens on
@@ -58,7 +58,7 @@ Anthropic for your plan windows, which you can turn off in settings.
 ### Option 1: Docker
 
 The image is on DockerHub ([`notaflightrisk/ai-usage-dashboard`](https://hub.docker.com/r/notaflightrisk/ai-usage-dashboard))
-and GHCR. Mount the directories you want read, plus somehwere to keep the database:
+and GHCR. Mount the directories you want read, plus somewhere to keep the database:
 
 ```shell
 docker run -p 127.0.0.1:8080:8080 \
@@ -135,8 +135,9 @@ npm run dev
 The dev server is then on [localhost:5173](http://localhost:5173). The other scripts you'll want
 are `npm run check` (types), `npm test` (tests) and `npm run format`.
 
-Provider logos come from [Simple Icons](https://simpleicons.org), which is CC0. The marks
-themselves belong to their owners and are only used to point at them.
+Provider logos come from [Simple Icons](https://simpleicons.org) (CC0) and
+[LobeHub](https://github.com/lobehub/lobe-icons) (MIT), which covers the few Simple Icons has
+dropped. The marks themselves belong to their owners and are only used to point at them.
 
 ---
 

@@ -15,10 +15,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
 
 const HELP = `
-  ai-usage-dashboard ${pkg.version}
+  aiusage ${pkg.version}
 
   Usage
-    $ ai-usage-dashboard [options]
+    $ aiusage [options]
 
   Options
     -p, --port <n>    Port to listen on, or the next free one (default 4747)

@@ -1,0 +1,53 @@
+name: 📡 Publish
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+    secrets:
+      NPM_TOKEN:
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to publish
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  npm:
+    name: 📡 npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+      - name: Match the version to the tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: npm version "$TAG" --no-git-tag-version --allow-same-version
+      - name: npm wants the readme at the root
+        run: cp .github/README.md README.md
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          npm publish --provenance --access public
+          echo "Published aiusage@$TAG" >> "$GITHUB_STEP_SUMMARY"
