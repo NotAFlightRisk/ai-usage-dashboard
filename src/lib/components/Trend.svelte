@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tooltip } from '$lib/tooltip';
-  import { compact, dayLabel, money } from '$lib/format';
+  import { compact, dayLabel, money, moneyCompact } from '$lib/format';
   import type { DayPoint } from '$lib/types';
 
   let {
@@ -37,7 +37,9 @@
     return `${dayLabel(column.day)} - ${format(column.total)}${parts ? ` (${parts})` : ''}`;
   };
 
-  const ticks = $derived([1, 0.5, 0].map((at) => ({ at, label: format(peak * at) })));
+  const tickLabel = (value: number) => (metric === 'cost' ? moneyCompact(value) : compact(value));
+
+  const ticks = $derived([1, 0.5, 0].map((at) => ({ at, label: tickLabel(peak * at) })));
 </script>
 
 <div class="trend">
@@ -68,6 +70,8 @@
 
 <style>
   .trend {
+    --gutter: 48px;
+
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -76,18 +80,20 @@
   .plot {
     position: relative;
     height: 200px;
-    padding-left: 44px;
+    padding-left: var(--gutter);
   }
 
   .tick {
     position: absolute;
-    left: 0;
+    left: var(--gutter);
     right: 0;
     border-top: 1px dashed var(--border);
 
     span {
       position: absolute;
       right: calc(100% + 8px);
+      width: calc(var(--gutter) - 8px);
+      text-align: right;
       transform: translateY(-50%);
       font-size: 0.6875rem;
       color: var(--text-faint);
@@ -95,7 +101,9 @@
     }
   }
 
+  /* Positioned so the bars paint over the grid lines rather than under them. */
   .bars {
+    position: relative;
     display: flex;
     align-items: flex-end;
     gap: 2px;
@@ -133,7 +141,7 @@
   .axis {
     display: flex;
     justify-content: space-between;
-    padding-left: 44px;
+    padding-left: var(--gutter);
     font-size: 0.6875rem;
     color: var(--text-faint);
   }
