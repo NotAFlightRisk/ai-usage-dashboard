@@ -1,4 +1,4 @@
-name: 📦 Release
+name: 📡 Publish
 
 on:
   workflow_call:
@@ -6,10 +6,13 @@ on:
       tag:
         type: string
         required: true
+    secrets:
+      NPM_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag to release
+        description: Tag to publish
         type: string
         required: true
 
@@ -17,11 +20,12 @@ permissions:
   contents: read
 
 jobs:
-  release:
-    name: 📦 Build and publish
+  npm:
+    name: 📡 npm
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -31,25 +35,23 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build
       - name: Match the version to the tag
         env:
           TAG: ${{ inputs.tag }}
         run: npm version "$TAG" --no-git-tag-version --allow-same-version
-      - name: Pack the server
+      - name: npm wants the readme at the root
+        run: cp .github/README.md README.md
+      - name: Publish
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           TAG: ${{ inputs.tag }}
         run: |
-          tar -czf "ai-usage-dashboard-$TAG.tar.gz" build bin package.json package-lock.json .env.example
-          echo "Run it with: npm ci --omit=dev && npm start" >> "$GITHUB_STEP_SUMMARY"
-      - name: Publish the release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag }}
-        run: |
-          gh release create "$TAG" "ai-usage-dashboard-$TAG.tar.gz" \
-            --title "$TAG" \
-            --generate-notes \
-            --repo "$GITHUB_REPOSITORY"
-          echo "Released $TAG" >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "No NPM_TOKEN, so nothing was published" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          npm publish --provenance --access public
+          echo "Published aiusage@$TAG" >> "$GITHUB_STEP_SUMMARY"
