@@ -7,7 +7,6 @@
     "build": "vite build",
     "start": "node bin/ai-usage-dashboard.js",
     "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "format": "prettier --write .",
@@ -27,13 +26,28 @@
     "vitest": "^5.0.0"
   },
   "description": "One command, one page: every token your AI coding tools have spent",
+  "keywords": [
+    "ai",
+    "usage",
+    "tokens",
+    "dashboard",
+    "cli",
+    "claude-code",
+    "codex",
+    "opencode",
+    "llm",
+    "cost"
+  ],
   "license": "MIT",
+  "homepage": "https://github.com/NotAFlightRisk/ai-usage-dashboard",
+  "bugs": "https://github.com/NotAFlightRisk/ai-usage-dashboard/issues",
   "bin": {
     "aiusage": "bin/ai-usage-dashboard.js"
   },
   "files": [
     "bin",
     "build",
+    "!build/**/*.map",
     "LICENSE"
   ],
   "engines": {
