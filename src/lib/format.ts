@@ -79,8 +79,9 @@ export function duration(ms: number): string {
 export const projectName = (path: string) =>
   path ? path.replace(/\/+$/, '').split('/').pop() || path : 'unknown';
 
+/** Drops the vendor prefix and the release stamp vendors tack on the end. */
 export const modelName = (model: string) =>
-  model.includes('/') ? model.slice(model.indexOf('/') + 1) : model;
+  (model.includes('/') ? model.slice(model.indexOf('/') + 1) : model).replace(/-\d{8}$/, '');
 
 export function delta(now: number, before: number): { text: string; tone: string } | null {
   if (!before) return null;

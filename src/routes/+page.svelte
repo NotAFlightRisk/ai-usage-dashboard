@@ -150,7 +150,7 @@
         display: show(measure(slice)),
         colour: provider.colour,
         mark: provider.id,
-        hint: `${full(slice.total)} tokens over ${full(slice.events)} requests, ${money(slice.cost)} estimated`
+        hint: `${slice.key} - ${full(slice.total)} tokens over ${full(slice.events)} requests, ${money(slice.cost)} estimated`
       };
     })
   );
