@@ -17,10 +17,8 @@
 
   const peak = $derived(Math.max(1, ...grid.values()));
 
-  const level = (value: number) => {
-    if (!value) return 0;
-    return Math.min(5, Math.ceil((value / peak) * 5));
-  };
+  /** Punch card: area scales with the total, so the radius goes as the square root. */
+  const dot = (value: number) => (value ? 0.32 + 0.68 * Math.sqrt(value / peak) : 0);
 </script>
 
 <div class="clock">
@@ -31,7 +29,7 @@
         {#each Array(24) as _, hour (hour)}
           {@const value = grid.get(`${row}-${hour}`) ?? 0}
           <i
-            style="background: var(--ramp-{level(value)})"
+            style="--dot: {dot(value)}"
             use:tooltip={`${day} ${String(hour).padStart(2, '0')}:00 - ${value ? `${compact(value)} tokens` : 'nothing'}`}
           ></i>
         {/each}
@@ -72,11 +70,22 @@
 
     i {
       aspect-ratio: 1;
-      border-radius: 3px;
-      transition: opacity var(--quick);
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--surface-2);
 
-      &:hover {
-        opacity: 0.7;
+      &::after {
+        content: '';
+        width: calc(var(--dot) * 100%);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--accent);
+        transition: transform var(--quick);
+      }
+
+      &:hover::after {
+        transform: scale(1.25);
       }
     }
   }
