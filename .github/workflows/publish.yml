@@ -8,7 +8,7 @@ on:
         required: true
     secrets:
       NPM_TOKEN:
-        required: false
+        required: true
   workflow_dispatch:
     inputs:
       tag:
@@ -27,6 +27,14 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - name: Make sure there is a token to publish with
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::NPM_TOKEN is not set, so nothing would reach npm"
+            exit 1
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ inputs.tag }}
@@ -49,9 +57,5 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           TAG: ${{ inputs.tag }}
         run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "No NPM_TOKEN, so nothing was published" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
           npm publish --provenance --access public
-          echo "Published aiusage@$TAG" >> "$GITHUB_STEP_SUMMARY"
+          echo "Published $(node -p 'require("./package.json").name')@$TAG" >> "$GITHUB_STEP_SUMMARY"
