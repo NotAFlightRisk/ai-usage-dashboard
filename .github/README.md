@@ -37,12 +37,13 @@ price for is reported as unpriced, never quietly counted as free.
 ## Usage
 
 ```shell
-npx aiusage
+npx token-usage-dashboard
 ```
 
 That's it. It finds your transcripts, reads them, and opens on
-[localhost:4747](http://localhost:4747). Nothing leaves the machine except the one call to
-Anthropic for your plan windows, which you can turn off in settings.
+[localhost:4747](http://localhost:4747). Install it globally and the command is just `aiusage`.
+Nothing leaves the machine except the one call to Anthropic for your plan windows, which you can
+turn off in settings.
 
 | Flag                   | What it does                                     |
 | ---------------------- | ------------------------------------------------ |
