@@ -1,6 +1,7 @@
-<h1 align="center">AI usage dashboard 📊</h1>
+<h1 align="center">AI usage dashboard</h1>
 <p align="center">
-<i>Every token your AI coding tools have spent, off the transcripts already on your machine</i>
+<i>Beautiful dashboard showing a breakdown of where all of your tokens are going</i><br>
+<b><code>npx token-usage-dashboard</code></b>
 </p>
 
 <p align="center">
@@ -11,26 +12,20 @@
 
 ## About
 
-Claude Code, Codex and friends all leave a paper trail. A JSONL transcript per session, token
-counts on every turn, and in Codex's case the rate-limit windows too. Nothing reads them, so you
-end up guessing what a week of agents actually cost you.
+Ever wondered where all your tokens are going? Or how much your AI usage is valued at?
+This usage dashboard reads your local Claude Code, Codex, Open Code transcripts and builds a beautiful dashboard breaking down your full historical usage.
 
-This reads those files, keeps a copy in a small SQLite database, and draws the lot:
+Everything happens locally, so your data never leaves your device.
+Stats are cached in a local SQLite DB, so that you get full history even after Claude and Codex have pruned old transcripts.
+Cost estimates come from current published API rates.
 
+The dashboard shows:
 - a calendar heatmap of every day since your records start
-- daily totals, stacked by tool or by model
+- daily totals, stacked by tool, model and project
 - the split between fresh input, output, cache reads and cache writes
-- which projects and models the tokens went to
-- your Claude 5-hour and 7-day windows, and the Codex ones
-- every session, with what it spent and how long it ran
-
-The database matters more than it sounds like it should. Claude Code prunes its transcripts after
-a week or two, so anything not copied out is gone. Once this has been running a while its history
-goes back further than the files do.
-
-Cost is an estimate at published API rates. If you're on a subscription that's a weight rather
-than a bill, and the plan windows are the thing really constraining you. A model we have no
-price for is reported as unpriced, never quietly counted as free.
+- which projects, AI providers and models the your tokens went to
+- Anthropic and OpenAI 5-hour and 7-day windows
+- every session, with full token usage breakdown
 
 ---
 
@@ -51,6 +46,30 @@ turn off in settings.
 | `-h, --host <ip>`      | Address to bind, `127.0.0.1` by default          |
 | `--db <path>`          | Where to keep the history                        |
 | `--open` / `--no-open` | Whether to open a browser                        |
+
+---
+
+## Configuration
+
+Most of it lives behind the gear icon: theme, default range, how often to rescan, whether to ask
+Anthropic for your plan windows, and price overrides for any model we've got wrong or don't know.
+
+Paths are environment variables, since they're needed before the app starts. See
+[`.env.example`](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/.env.example) for the full list. The ones you'll actually want are
+`AIUSAGE_DB`, `AIUSAGE_CLAUDE_DIR` and `AIUSAGE_CODEX_DIR`.
+
+---
+
+## Supported tools
+
+| Tool        | Where it reads                                                 |
+| ----------- | -------------------------------------------------------------- |
+| Claude Code | `~/.claude/projects/**/*.jsonl`, subagent transcripts included |
+| Codex       | `~/.codex/sessions/**/*.jsonl`                                 |
+| OpenCode    | `~/.local/share/opencode/storage/message`                      |
+
+Adding another is one file in `src/lib/server/sources/`. If a tool writes token counts somewhere
+we can read, it can go in - open an issue with a sample and we'll have a look.
 
 ---
 
@@ -91,40 +110,12 @@ then `npm ci --omit=dev && npm start`.
 
 Follow [Development](#development) below, then `npm run build && npm start`.
 
-No hosted deploy, and there won't be one. It reads files on your machine, so somebody else's
-server would have nothing to look at.
-
----
-
-## Configuration
-
-Most of it lives behind the gear icon: theme, default range, how often to rescan, whether to ask
-Anthropic for your plan windows, and price overrides for any model we've got wrong or don't know.
-
-Paths are environment variables, since they're needed before the app starts. See
-[`.env.example`](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/.env.example) for the full list. The ones you'll actually want are
-`AIUSAGE_DB`, `AIUSAGE_CLAUDE_DIR` and `AIUSAGE_CODEX_DIR`.
-
----
-
-## Supported tools
-
-| Tool        | Where it reads                                                 |
-| ----------- | -------------------------------------------------------------- |
-| Claude Code | `~/.claude/projects/**/*.jsonl`, subagent transcripts included |
-| Codex       | `~/.codex/sessions/**/*.jsonl`                                 |
-| OpenCode    | `~/.local/share/opencode/storage/message`                      |
-
-Adding another is one file in `src/lib/server/sources/`. If a tool writes token counts somewhere
-we can read, it can go in - open an issue with a sample and we'll have a look.
-
 ---
 
 ## Development
 
-You'll need [Node](https://nodejs.org/) 22.12 or newer (that's where `node:sqlite` lands), plus
-[Git](https://git-scm.com/). It's a [SvelteKit](https://svelte.dev/docs/kit) app and the build
-comes out self-contained, so an install of it pulls in no runtime dependencies at all.
+You'll need [Node](https://nodejs.org/) 22.12 or newer, plus [Git](https://git-scm.com/).
+It's a [SvelteKit](https://svelte.dev/docs/kit) app and the build is self-contained so there's no runtime dependencies at all.
 
 ```bash
 git clone git@github.com:NotAFlightRisk/ai-usage-dashboard.git
@@ -133,12 +124,8 @@ npm install
 npm run dev
 ```
 
-The dev server is then on [localhost:5173](http://localhost:5173). The other scripts you'll want
-are `npm run check` (types), `npm test` (tests) and `npm run format`.
-
-Provider logos come from [Simple Icons](https://simpleicons.org) (CC0) and
-[LobeHub](https://github.com/lobehub/lobe-icons) (MIT), which covers the few Simple Icons has
-dropped. The marks themselves belong to their owners and are only used to point at them.
+The dev server is then on [localhost:5173](http://localhost:5173).
+The other scripts you'll want are `npm run check` (types), `npm test` (tests) and `npm run format` (prettier).
 
 ---
 
