@@ -108,6 +108,32 @@ describe('usage', () => {
     expect(result.totals.sessions).toBe(5);
   });
 
+  it('works out peak context, cache hits and the subagent share per session', () => {
+    const at = new Date(now - DAY);
+    const insert = handle.prepare(
+      'insert into events (id, tool, model, session, project, ts, day, dow, hour, input, output,' +
+        ' cache_read, cache_write, reasoning, subagent)' +
+        " values (?, 'claude-code', 'claude-opus-5', 'busy', '/work/agents', ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)"
+    );
+    const place = [at.getTime(), localDay(at), at.getDay(), at.getHours()];
+    insert.run('main', ...place, 10, 50, 600, 340, 0);
+    insert.run('side', ...place, 100, 100, 200, 100, 1);
+    handle.prepare("insert into names values ('claude-code', 'busy', 'maintain')").run();
+
+    const [session] = usage(filters({ projects: ['/work/agents'] })).sessions;
+    expect(session).toMatchObject({ name: 'maintain', peak: 950, turns: 2, total: 1500 });
+    expect(session.cacheHit).toBeCloseTo(800 / 1350);
+    expect(session.subagents).toBeCloseTo(500 / 1500);
+  });
+
+  it('leaves the subagent share blank for a tool that never says', () => {
+    add('solo', 'codex', 'gpt-5.6-sol', '/work/solo', 1, 10);
+
+    const [session] = usage(filters({ projects: ['/work/solo'] })).sessions;
+    expect(session.subagents).toBeNull();
+    expect(session.name).toBeNull();
+  });
+
   it('keeps the project filter on the calendar', () => {
     const result = usage(filters({ projects: ['/work/two'] }));
     expect(result.calendar).toHaveLength(1);

@@ -23,7 +23,8 @@ create table if not exists events (
   output integer not null default 0,
   cache_read integer not null default 0,
   cache_write integer not null default 0,
-  reasoning integer not null default 0
+  reasoning integer not null default 0,
+  subagent integer
 );
 create index if not exists events_ts on events (ts);
 create index if not exists events_day on events (day);
@@ -34,6 +35,12 @@ create table if not exists files (
   mtime integer not null,
   events integer not null default 0,
   scanned_at integer not null
+);
+create table if not exists names (
+  tool text not null,
+  session text not null,
+  name text not null,
+  primary key (tool, session)
 );
 create table if not exists windows (
   id text primary key,
@@ -64,8 +71,16 @@ export function db(): DatabaseSync {
     writeMeta('schema', String(SCHEMA));
   }
   handle.exec(TABLES);
+  addSubagent(handle);
   rebucket(handle);
   return handle;
+}
+
+/** Older databases grow the column in place, then every file is read again to fill it in */
+function addSubagent(handle: DatabaseSync): void {
+  const columns = handle.prepare('pragma table_info(events)').all() as { name: string }[];
+  if (columns.some((column) => column.name === 'subagent')) return;
+  handle.exec('alter table events add column subagent integer; delete from files');
 }
 
 const REBUCKET = `

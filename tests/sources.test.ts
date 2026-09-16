@@ -34,6 +34,29 @@ describe('the Claude Code reader', () => {
     expect(events[0].project).toBe('/work/thing');
   });
 
+  it('prefers a name somebody typed over the one Claude guessed, whatever the order', () => {
+    const title = (type: string, field: string, value: string) =>
+      JSON.stringify({ type, [field]: value, sessionId: 'session-a' });
+    const text = [
+      title('custom-title', 'customTitle', 'maintain'),
+      title('ai-title', 'aiTitle', 'Fixing the thing')
+    ].join('\n');
+
+    expect(claudeCode.parse('/x.jsonl', text).names).toEqual({ 'session-a': 'maintain' });
+  });
+
+  it('flags subagent lines so their share can be told apart', () => {
+    const text = [
+      claudeLine('msg_4', { output_tokens: 5 }),
+      claudeLine('msg_5', { output_tokens: 5 }, { isSidechain: true })
+    ].join('\n');
+
+    expect(claudeCode.parse('/x.jsonl', text).events.map((event) => event.subagent)).toEqual([
+      false,
+      true
+    ]);
+  });
+
   it('skips synthetic models and anything without usage', () => {
     const text = [
       JSON.stringify({ type: 'user', message: { content: 'hello' } }),

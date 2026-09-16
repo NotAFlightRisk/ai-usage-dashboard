@@ -8,6 +8,7 @@ export type Settings = {
   scanIntervalSec: number;
   claudeWindows: boolean;
   prices: Record<string, Rate>;
+  hiddenColumns: string[];
 };
 
 const DEFAULTS: Settings = {
@@ -16,7 +17,8 @@ const DEFAULTS: Settings = {
   metric: 'tokens',
   scanIntervalSec: 120,
   claudeWindows: true,
-  prices: {}
+  prices: {},
+  hiddenColumns: []
 };
 
 let cached: Settings | null = null;

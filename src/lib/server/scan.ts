@@ -27,11 +27,17 @@ async function listFiles(source: Source): Promise<string[]> {
 
 const INSERT =
   'insert into events (id, tool, model, session, project, ts, day, dow, hour, input, output,' +
-  ' cache_read, cache_write, reasoning) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' +
+  ' cache_read, cache_write, reasoning, subagent)' +
+  ' values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' +
   ' on conflict(id) do update set input = max(input, excluded.input),' +
   ' output = max(output, excluded.output), cache_read = max(cache_read, excluded.cache_read),' +
   ' cache_write = max(cache_write, excluded.cache_write),' +
-  ' reasoning = max(reasoning, excluded.reasoning)';
+  ' reasoning = max(reasoning, excluded.reasoning),' +
+  ' subagent = coalesce(excluded.subagent, subagent)';
+
+const INSERT_NAME =
+  'insert into names (tool, session, name) values (?, ?, ?)' +
+  ' on conflict(tool, session) do update set name = excluded.name';
 
 const INSERT_WINDOW =
   'insert into windows (id, tool, label, used_percent, window_minutes, resets_at, detail, seen_at)' +
@@ -67,6 +73,7 @@ async function scanSource(source: Source): Promise<SourceStat> {
   );
   const insert = handle.prepare(INSERT);
   const insertWindow = handle.prepare(INSERT_WINDOW);
+  const insertName = handle.prepare(INSERT_NAME);
   const touch = handle.prepare(
     'insert into files (path, tool, size, mtime, events, scanned_at) values (?, ?, ?, ?, ?, ?)' +
       ' on conflict(path) do update set size = excluded.size, mtime = excluded.mtime,' +
@@ -113,8 +120,12 @@ async function scanSource(source: Source): Promise<SourceStat> {
           event.output,
           event.cache_read,
           event.cache_write,
-          event.reasoning
+          event.reasoning,
+          event.subagent === undefined ? null : Number(event.subagent)
         );
+      }
+      for (const [session, name] of Object.entries(parsed.names ?? {})) {
+        insertName.run(source.id, session, name);
       }
       for (const window of parsed.windows ?? []) {
         insertWindow.run(

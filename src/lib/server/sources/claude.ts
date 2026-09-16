@@ -38,9 +38,22 @@ export const claudeCode: Source = {
         output: num(usage.output_tokens),
         cache_read: num(usage.cache_read_input_tokens),
         cache_write: num(usage.cache_creation_input_tokens),
-        reasoning: num(details?.thinking_tokens)
+        reasoning: num(details?.thinking_tokens),
+        subagent: line.isSidechain === true
       });
     }
-    return { events };
+    return { events, names: names(text) };
   }
 };
+
+/** A name somebody typed beats the one Claude came up with, whichever landed last */
+function names(text: string): Record<string, string> {
+  const typed: Record<string, string> = {};
+  const guessed: Record<string, string> = {};
+  for (const line of jsonLines(text, '-title"')) {
+    const session = String(line.sessionId || '');
+    if (line.type === 'custom-title' && line.customTitle) typed[session] = String(line.customTitle);
+    if (line.type === 'ai-title' && line.aiTitle) guessed[session] = String(line.aiTitle);
+  }
+  return { ...guessed, ...typed };
+}
