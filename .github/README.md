@@ -20,6 +20,7 @@ Stats are cached in a local SQLite DB, so that you get full history even after C
 Cost estimates come from current published API rates.
 
 The dashboard shows:
+
 - a calendar heatmap of every day since your records start
 - daily totals, stacked by tool, model and project
 - the split between fresh input, output, cache reads and cache writes
