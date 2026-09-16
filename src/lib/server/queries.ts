@@ -182,17 +182,25 @@ function clock(filters: Filters) {
   }));
 }
 
+const SESSION_SUMS =
+  'max(input + cache_read + cache_write) peak, count(subagent) flagged,' +
+  ' sum(case when subagent = 1 then input + output + cache_read + cache_write end) side';
+
 function sessions(filters: Filters, overrides: Record<string, Rate>, limit = 60): SessionRow[] {
   const clause = where(filters);
   const rows = db()
     .prepare(
       'select session key, tool, project, model, min(ts) started, max(ts) ended, ' +
-        SUMS +
-        ` from events ${clause.sql} group by session, tool, project, model`
+        `${SUMS}, ${SESSION_SUMS} from events ${clause.sql} group by session, tool, project, model`
     )
     .all(...clause.params) as Row[];
 
-  type Merged = Omit<SessionRow, 'models'> & { models: Set<string> };
+  type Merged = Omit<SessionRow, 'name' | 'models' | 'cacheHit' | 'subagents'> & {
+    models: Set<string>;
+    read: number;
+    fed: number;
+    side: number | null;
+  };
   const merged = new Map<string, Merged>();
   for (const row of rows) {
     const id = String(row.key);
@@ -205,7 +213,12 @@ function sessions(filters: Filters, overrides: Record<string, Rate>, limit = 60)
       started: Number(row.started),
       ended: Number(row.ended),
       total: 0,
-      cost: 0
+      cost: 0,
+      peak: 0,
+      turns: 0,
+      read: 0,
+      fed: 0,
+      side: null
     };
     const tokens: Tokens = {
       input: Number(row.input) || 0,
@@ -217,16 +230,28 @@ function sessions(filters: Filters, overrides: Record<string, Rate>, limit = 60)
     entry.started = Math.min(entry.started, Number(row.started));
     entry.ended = Math.max(entry.ended, Number(row.ended));
     entry.total += totalOf(tokens);
+    entry.peak = Math.max(entry.peak, Number(row.peak) || 0);
+    entry.turns += Number(row.events) || 0;
+    entry.read += tokens.cache_read;
+    entry.fed += tokens.input + tokens.cache_read + tokens.cache_write;
+    if (Number(row.flagged)) entry.side = (entry.side ?? 0) + (Number(row.side) || 0);
     const cost = costOf(String(row.model), tokens, overrides);
     if (cost === null) entry.cost = null;
     else if (entry.cost !== null) entry.cost += cost;
     merged.set(at, entry);
   }
 
+  const name = db().prepare('select name from names where tool = ? and session = ?');
   return [...merged.values()]
     .sort((a, b) => b.ended - a.ended)
     .slice(0, limit)
-    .map(({ models, ...row }) => ({ ...row, models: [...models].sort().join(', ') }));
+    .map(({ models, read, fed, side, ...row }) => ({
+      ...row,
+      name: (name.get(row.tool, row.id) as { name: string } | undefined)?.name ?? null,
+      models: [...models].sort().join(', '),
+      cacheHit: fed ? read / fed : null,
+      subagents: side === null || !row.total ? null : side / row.total
+    }));
 }
 
 const distinct = (column: string) =>

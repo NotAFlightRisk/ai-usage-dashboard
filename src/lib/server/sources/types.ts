@@ -9,6 +9,7 @@ export type Event = {
   cache_read: number;
   cache_write: number;
   reasoning: number;
+  subagent?: boolean;
 };
 
 export type Window = {
@@ -21,7 +22,7 @@ export type Window = {
   seen_at: number;
 };
 
-export type Parsed = { events: Event[]; windows?: Window[] };
+export type Parsed = { events: Event[]; windows?: Window[]; names?: Record<string, string> };
 
 export type Source = {
   id: string;

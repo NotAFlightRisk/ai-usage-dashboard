@@ -14,6 +14,7 @@ export type DayPoint = { day: string; key: string; total: number; cost: number |
 
 export type SessionRow = {
   id: string;
+  name: string | null;
   tool: string;
   project: string;
   models: string;
@@ -21,6 +22,10 @@ export type SessionRow = {
   ended: number;
   total: number;
   cost: number | null;
+  peak: number;
+  cacheHit: number | null;
+  subagents: number | null;
+  turns: number;
 };
 
 export type WindowRow = {

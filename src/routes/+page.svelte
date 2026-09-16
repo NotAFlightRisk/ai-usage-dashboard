@@ -12,7 +12,8 @@
   import Split from '$lib/components/Split.svelte';
   import Clock from '$lib/components/Clock.svelte';
   import Meter from '$lib/components/Meter.svelte';
-  import Sessions from '$lib/components/Sessions.svelte';
+  import Sessions, { COLUMNS } from '$lib/components/Sessions.svelte';
+  import Fields from '$lib/components/Fields.svelte';
   import Problems from '$lib/components/Problems.svelte';
   import SettingsDialog from '$lib/components/Settings.svelte';
   import Logo from '$lib/logos/Logo.svelte';
@@ -51,6 +52,7 @@
   let trendBy = $state<'tool' | 'model'>('tool');
   let modelView = $state<'share' | 'list'>('share');
   let projectBy = $state<'measure' | 'sessions'>('measure');
+  let hiddenColumns = $state<string[]>(first.settings.hiddenColumns);
 
   const query = $derived(
     new URLSearchParams({
@@ -467,10 +469,17 @@
       <BarList rows={toolRows} active={tools} onpick={(id) => (tools = toggle(tools, id))} />
     </Panel>
 
-    <Panel title="Recent sessions" span={12}>
+    <Panel title="Recent sessions" span={12} hint="Click a column heading to sort by it">
+      {#snippet actions()}
+        <Fields
+          options={COLUMNS}
+          bind:hidden={hiddenColumns}
+          onchange={(hidden) => save({ hiddenColumns: hidden })}
+        />
+      {/snippet}
       <Sessions
         rows={usage.sessions}
-        {metric}
+        hidden={hiddenColumns}
         onpick={(project) => (projects = toggle(projects, project))}
       />
     </Panel>
