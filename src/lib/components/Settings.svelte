@@ -2,10 +2,11 @@
   import { RANGES } from '$lib/range';
   import { relative } from '$lib/format';
   import { RATES, type Rate } from '$lib/pricing';
+  import { THEMES, type Theme } from '$lib/themes';
   import type { Usage } from '$lib/types';
 
   type Saved = {
-    theme: 'auto' | 'light' | 'dark';
+    theme: Theme;
     range: string;
     metric: 'tokens' | 'cost';
     scanIntervalSec: number;
@@ -71,9 +72,16 @@
   };
 </script>
 
-<dialog bind:this={dialog} onclose={() => (open = false)}>
+<dialog
+  bind:this={dialog}
+  aria-labelledby="settings-title"
+  onclose={() => (open = false)}
+  onpointerdown={(event) => {
+    if (event.target === dialog) open = false;
+  }}
+>
   <header>
-    <h2>Settings</h2>
+    <h2 id="settings-title">Settings</h2>
     <button type="button" class="close" aria-label="Close settings" onclick={() => (open = false)}>
       <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
         <path
@@ -95,9 +103,9 @@
           value={saved.theme}
           onchange={(event) => onsave({ theme: event.currentTarget.value as Saved['theme'] })}
         >
-          <option value="auto">Match the system</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
+          {#each THEMES as theme (theme.id)}
+            <option value={theme.id}>{theme.label}</option>
+          {/each}
         </select>
       </label>
       <label class="field">
@@ -210,6 +218,11 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-pop);
+
+    &[open] {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
 
     &::backdrop {
       background: rgb(10 10 16 / 0.5);
