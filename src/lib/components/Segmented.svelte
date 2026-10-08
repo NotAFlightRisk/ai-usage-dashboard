@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends string">
-  import { tooltip } from '$lib/tooltip';
+  import { tooltip } from '#lib/tooltip.js';
 
   let {
     options,

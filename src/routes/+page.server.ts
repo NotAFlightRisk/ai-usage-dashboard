@@ -1,7 +1,7 @@
-import { filtersFrom } from '$lib/server/request';
-import { usage } from '$lib/server/queries';
-import { settings } from '$lib/server/settings';
-import { config } from '$lib/server/config';
+import { filtersFrom } from '#lib/server/request.js';
+import { usage } from '#lib/server/queries.js';
+import { settings } from '#lib/server/settings.js';
+import { config } from '#lib/server/config.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = ({ url }) => ({

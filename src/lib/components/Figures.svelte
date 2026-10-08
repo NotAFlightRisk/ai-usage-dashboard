@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
-  import { compact, delta, full, money } from '$lib/format';
-  import type { Slice } from '$lib/types';
+  import { tooltip } from '#lib/tooltip.js';
+  import { compact, delta, full, money } from '#lib/format.js';
+  import type { Slice } from '#lib/types.js';
 
   let {
     totals,

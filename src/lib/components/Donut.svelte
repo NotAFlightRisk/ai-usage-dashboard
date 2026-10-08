@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
+  import { tooltip } from '#lib/tooltip.js';
 
   let {
     slices,

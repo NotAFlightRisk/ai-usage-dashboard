@@ -1,25 +1,25 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { replaceState } from '$app/navigation';
-  import Panel from '$lib/components/Panel.svelte';
-  import Segmented from '$lib/components/Segmented.svelte';
-  import MultiSelect from '$lib/components/MultiSelect.svelte';
-  import Figures from '$lib/components/Figures.svelte';
-  import Calendar from '$lib/components/Calendar.svelte';
-  import Trend from '$lib/components/Trend.svelte';
-  import BarList from '$lib/components/BarList.svelte';
-  import Donut from '$lib/components/Donut.svelte';
-  import Split from '$lib/components/Split.svelte';
-  import Clock from '$lib/components/Clock.svelte';
-  import Meter from '$lib/components/Meter.svelte';
-  import Sessions, { COLUMNS } from '$lib/components/Sessions.svelte';
-  import Fields from '$lib/components/Fields.svelte';
-  import Problems from '$lib/components/Problems.svelte';
-  import SettingsDialog from '$lib/components/Settings.svelte';
-  import Logo from '$lib/logos/Logo.svelte';
-  import Mark from '$lib/logos/Mark.svelte';
-  import { tooltip } from '$lib/tooltip';
-  import { RANGES, rangeLabel } from '$lib/range';
+  import { goto } from '$app/navigation';
+  import Panel from '#lib/components/Panel.svelte';
+  import Segmented from '#lib/components/Segmented.svelte';
+  import MultiSelect from '#lib/components/MultiSelect.svelte';
+  import Figures from '#lib/components/Figures.svelte';
+  import Calendar from '#lib/components/Calendar.svelte';
+  import Trend from '#lib/components/Trend.svelte';
+  import BarList from '#lib/components/BarList.svelte';
+  import Donut from '#lib/components/Donut.svelte';
+  import Split from '#lib/components/Split.svelte';
+  import Clock from '#lib/components/Clock.svelte';
+  import Meter from '#lib/components/Meter.svelte';
+  import Sessions, { COLUMNS } from '#lib/components/Sessions.svelte';
+  import Fields from '#lib/components/Fields.svelte';
+  import Problems from '#lib/components/Problems.svelte';
+  import SettingsDialog from '#lib/components/Settings.svelte';
+  import Logo from '#lib/logos/Logo.svelte';
+  import Mark from '#lib/logos/Mark.svelte';
+  import { tooltip } from '#lib/tooltip.js';
+  import { RANGES, rangeLabel } from '#lib/range.js';
   import {
     compact,
     full,
@@ -28,9 +28,9 @@
     moneyCompact,
     projectName,
     relative
-  } from '$lib/format';
-  import { providerFor, providerMeta, toolMeta } from '$lib/providers';
-  import type { Usage } from '$lib/types';
+  } from '#lib/format.js';
+  import { providerFor, providerMeta, toolMeta } from '#lib/providers.js';
+  import type { Usage } from '#lib/types.js';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
@@ -78,7 +78,7 @@
   $effect(() => {
     if (query === showing) return;
     showing = query;
-    replaceState(`?${query}`, {});
+    void goto(`?${query}`, { shallow: true, replace: true });
     void pull(query);
   });
 
@@ -92,19 +92,22 @@
     document.documentElement.dataset.theme = theme === 'auto' ? '' : theme;
   });
 
-  async function save(patch: Record<string, unknown>) {
-    const response = await fetch('/api/settings', {
+  const post = (path: string, body: Record<string, unknown> = {}) =>
+    fetch(path, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(patch)
+      body: JSON.stringify(body)
     });
+
+  async function save(patch: Record<string, unknown>) {
+    const response = await post('/api/settings', patch);
     if (response.ok) saved = await response.json();
   }
 
   async function rescan() {
     busy = true;
     try {
-      const response = await fetch(`/api/refresh?${showing}`, { method: 'POST' });
+      const response = await post(`/api/refresh?${showing}`);
       if (response.ok) usage = await response.json();
     } finally {
       busy = false;

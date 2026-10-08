@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { tooltip } from '$lib/tooltip';
+  import { tooltip } from '#lib/tooltip.js';
 
   let {
     title,

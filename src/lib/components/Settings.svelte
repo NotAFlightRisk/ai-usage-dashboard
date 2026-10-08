@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { RANGES } from '$lib/range';
-  import { relative } from '$lib/format';
-  import { RATES, type Rate } from '$lib/pricing';
-  import { THEMES, type Theme } from '$lib/themes';
-  import type { Usage } from '$lib/types';
+  import { RANGES } from '#lib/range.js';
+  import { relative } from '#lib/format.js';
+  import { RATES, type Rate } from '#lib/pricing.js';
+  import { THEMES, type Theme } from '#lib/themes.js';
+  import type { Usage } from '#lib/types.js';
 
   type Saved = {
     theme: Theme;

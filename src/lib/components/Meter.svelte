@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
-  import { relative } from '$lib/format';
-  import type { WindowRow } from '$lib/types';
+  import { tooltip } from '#lib/tooltip.js';
+  import { relative } from '#lib/format.js';
+  import type { WindowRow } from '#lib/types.js';
 
   let { window: meter }: { window: WindowRow } = $props();
 
