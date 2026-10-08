@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
-  import { compact, dayLabel, money } from '$lib/format';
+  import { tooltip } from '#lib/tooltip.js';
+  import { compact, dayLabel, money } from '#lib/format.js';
 
   type Day = { day: string; total: number; cost: number | null; events: number };
 

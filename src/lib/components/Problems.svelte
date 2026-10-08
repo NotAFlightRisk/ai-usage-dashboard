@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { relative } from '$lib/format';
-  import type { Usage } from '$lib/types';
+  import { relative } from '#lib/format.js';
+  import type { Usage } from '#lib/types.js';
 
   let { problems }: { problems: Usage['problems'] } = $props();
 

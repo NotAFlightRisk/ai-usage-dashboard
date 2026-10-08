@@ -1,6 +1,6 @@
 <script lang="ts" module>
-  import { clockLabel, compact, duration, modelName, money, percent } from '$lib/format';
-  import type { SessionRow } from '$lib/types';
+  import { clockLabel, compact, duration, modelName, money, percent } from '#lib/format.js';
+  import type { SessionRow } from '#lib/types.js';
 
   type Column = {
     id: string;
@@ -89,10 +89,10 @@
 </script>
 
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
-  import Mark from '$lib/logos/Mark.svelte';
-  import { projectName } from '$lib/format';
-  import { toolMeta } from '$lib/providers';
+  import { tooltip } from '#lib/tooltip.js';
+  import Mark from '#lib/logos/Mark.svelte';
+  import { projectName } from '#lib/format.js';
+  import { toolMeta } from '#lib/providers.js';
 
   let {
     rows,

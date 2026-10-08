@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
-  import Mark from '$lib/logos/Mark.svelte';
+  import { tooltip } from '#lib/tooltip.js';
+  import Mark from '#lib/logos/Mark.svelte';
 
   type Row = {
     id: string;

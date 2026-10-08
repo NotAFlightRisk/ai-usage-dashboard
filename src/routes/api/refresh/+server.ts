@@ -1,10 +1,9 @@
-import { json } from '@sveltejs/kit';
-import { refresh } from '$lib/server/refresh';
-import { filtersFrom } from '$lib/server/request';
-import { usage } from '$lib/server/queries';
+import { refresh } from '#lib/server/refresh.js';
+import { filtersFrom } from '#lib/server/request.js';
+import { usage } from '#lib/server/queries.js';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ url }) => {
   await refresh(true);
-  return json(usage(filtersFrom(url)));
+  return Response.json(usage(filtersFrom(url)));
 };

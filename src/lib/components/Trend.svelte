@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
-  import { compact, dayLabel, money, moneyCompact } from '$lib/format';
-  import type { DayPoint } from '$lib/types';
+  import { tooltip } from '#lib/tooltip.js';
+  import { compact, dayLabel, money, moneyCompact } from '#lib/format.js';
+  import type { DayPoint } from '#lib/types.js';
 
   let {
     series,

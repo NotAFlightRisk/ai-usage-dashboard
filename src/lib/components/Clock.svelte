@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { tooltip } from '$lib/tooltip';
-  import { compact } from '$lib/format';
+  import { tooltip } from '#lib/tooltip.js';
+  import { compact } from '#lib/format.js';
 
   let { points }: { points: { day: number; hour: number; total: number }[] } = $props();
 

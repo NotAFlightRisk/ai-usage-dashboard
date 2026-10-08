@@ -1,6 +1,6 @@
-import { boot } from '$lib/server/refresh';
-import { settings } from '$lib/server/settings';
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit/hooks';
+import { boot } from '#lib/server/refresh.js';
+import { settings } from '#lib/server/settings.js';
 
 boot();
 
