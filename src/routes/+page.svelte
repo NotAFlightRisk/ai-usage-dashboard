@@ -233,13 +233,13 @@
 </script>
 
 <svelte:head>
-  <title>AI usage dashboard</title>
+  <title>Token usage dashboard</title>
 </svelte:head>
 
 <header class="bar">
   <a class="brand" href="/">
     <Logo />
-    <span>AI usage</span>
+    <span>Token usage</span>
   </a>
 
   <div class="filters">

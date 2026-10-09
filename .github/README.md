@@ -1,11 +1,11 @@
-<h1 align="center">AI usage dashboard</h1>
+<h1 align="center">Token usage dashboard</h1>
 <p align="center">
 <i>Beautiful dashboard showing a breakdown of where all of your tokens are going</i><br>
 <b><code>npx token-usage-dashboard</code></b>
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/NotAFlightRisk/ai-usage-dashboard/main/.github/screenshot.png" width="800" alt="The dashboard, showing a usage calendar, daily totals and plan windows" />
+  <img src="https://raw.githubusercontent.com/NotAFlightRisk/token-usage-dashboard/main/.github/screenshot.png" width="800" alt="The dashboard, showing a usage calendar, daily totals and plan windows" />
 </p>
 
 ---
@@ -56,7 +56,7 @@ Most of it lives behind the gear icon: theme, default range, how often to rescan
 Anthropic for your plan windows, and price overrides for any model we've got wrong or don't know.
 
 Paths are environment variables, since they're needed before the app starts. See
-[`.env.example`](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/.env.example) for the full list. The ones you'll actually want are
+[`.env.example`](https://github.com/NotAFlightRisk/token-usage-dashboard/blob/main/.env.example) for the full list. The ones you'll actually want are
 `AIUSAGE_DB`, `AIUSAGE_CLAUDE_DIR` and `AIUSAGE_CODEX_DIR`.
 
 ---
@@ -78,18 +78,18 @@ we can read, it can go in - open an issue with a sample and we'll have a look.
 
 ### Option 1: Docker
 
-The image is on DockerHub ([`notaflightrisk/ai-usage-dashboard`](https://hub.docker.com/r/notaflightrisk/ai-usage-dashboard))
+The image is on DockerHub ([`notaflightrisk/token-usage-dashboard`](https://hub.docker.com/r/notaflightrisk/token-usage-dashboard))
 and GHCR. Mount the directories you want read, plus somewhere to keep the database:
 
 ```shell
 docker run -p 127.0.0.1:8080:8080 \
   -v ~/.claude:/home/node/.claude:ro \
   -v ~/.codex:/home/node/.codex:ro \
-  -v ai-usage:/data \
-  notaflightrisk/ai-usage-dashboard
+  -v token-usage:/data \
+  notaflightrisk/token-usage-dashboard
 ```
 
-There's a compose file in [`docker/`](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/docker/compose.yaml) if you'd rather. The container has
+There's a compose file in [`docker/`](https://github.com/NotAFlightRisk/token-usage-dashboard/blob/main/docker/compose.yaml) if you'd rather. The container has
 to bind `0.0.0.0` internally, so publish the port to localhost like that unless something in
 front of it is checking who's asking.
 
@@ -104,7 +104,7 @@ so it comes back after a reboot:
 
 ### Option 3: From a release
 
-Grab the tarball from [releases](https://github.com/NotAFlightRisk/ai-usage-dashboard/releases),
+Grab the tarball from [releases](https://github.com/NotAFlightRisk/token-usage-dashboard/releases),
 then `npm ci --omit=dev && npm start`.
 
 ### Option 4: From source
@@ -119,8 +119,8 @@ You'll need [Node](https://nodejs.org/) 22.12 or newer, plus [Git](https://git-s
 It's a [SvelteKit](https://svelte.dev/docs/kit) app and the build is self-contained so there's no runtime dependencies at all.
 
 ```bash
-git clone git@github.com:NotAFlightRisk/ai-usage-dashboard.git
-cd ai-usage-dashboard
+git clone git@github.com:NotAFlightRisk/token-usage-dashboard.git
+cd token-usage-dashboard
 npm install
 npm run dev
 ```
@@ -134,6 +134,6 @@ The other scripts you'll want are `npm run check` (types), `npm test` (tests) an
 <p  align="center">
   <a href="https://github.com/NotAFlightRisk"><img width="64" src="https://pixelflare.cc/iain/gif/penguin-dance.gif" /></a><br>
   <sup>
-    <i>Licensed under <a href="https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/LICENSE">MIT</a>, © <a href="https://peng.ly">NotAFlightRisk</a> 2026</i>
+    <i>Licensed under <a href="https://github.com/NotAFlightRisk/token-usage-dashboard/blob/main/LICENSE">MIT</a>, © <a href="https://peng.ly">NotAFlightRisk</a> 2026</i>
   </sup>
 </p>

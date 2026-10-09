@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the suggestion! Please [search existing issues and discussions](https://github.com/NotAFlightRisk/ai-usage-dashboard/issues?q=is%3Aissue) first to avoid duplicates.
+        Thanks for the suggestion! Please [search existing issues and discussions](https://github.com/NotAFlightRisk/token-usage-dashboard/issues?q=is%3Aissue) first to avoid duplicates.
 
   - type: textarea
     id: problem
@@ -52,5 +52,5 @@ body:
       options:
         - label: I have searched existing issues for duplicates
           required: true
-        - label: I agree to follow this project's [Code of Conduct](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/.github/CODE_OF_CONDUCT.md)
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/NotAFlightRisk/token-usage-dashboard/blob/main/.github/CODE_OF_CONDUCT.md)
           required: true

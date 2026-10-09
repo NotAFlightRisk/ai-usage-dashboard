@@ -1,5 +1,5 @@
 [Unit]
-Description=AI usage dashboard
+Description=Token usage dashboard
 After=network.target
 
 [Service]
@@ -8,7 +8,7 @@ WorkingDirectory=__DIR__
 Environment=NODE_ENV=production
 Environment=HOST=127.0.0.1
 Environment=PORT=__PORT__
-ExecStart=__NODE__ __DIR__/bin/ai-usage-dashboard.js --no-open
+ExecStart=__NODE__ __DIR__/bin/token-usage-dashboard.js --no-open
 Restart=on-failure
 RestartSec=5
 

@@ -17,7 +17,7 @@
   width={size}
   height={size}
   role="img"
-  aria-label="AI usage dashboard"
+  aria-label="Token usage dashboard"
 >
   <rect width="32" height="32" rx="8" fill="var(--accent)" />
   {#each cells as cell (`${cell.row}-${cell.column}`)}
