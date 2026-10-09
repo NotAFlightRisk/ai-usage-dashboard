@@ -78,5 +78,5 @@ body:
           required: true
         - label: I am running the latest version
           required: true
-        - label: I agree to follow this project's [Code of Conduct](https://github.com/NotAFlightRisk/ai-usage-dashboard/blob/main/.github/CODE_OF_CONDUCT.md)
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/NotAFlightRisk/token-usage-dashboard/blob/main/.github/CODE_OF_CONDUCT.md)
           required: true

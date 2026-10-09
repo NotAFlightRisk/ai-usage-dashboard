@@ -78,7 +78,7 @@ process.env.PORT = String(port);
 const shown = host === '0.0.0.0' || host === '::' ? 'localhost' : host;
 const url = `http://${shown.includes(':') ? `[${shown}]` : shown}:${port}`;
 await import(resolve(root, 'build', 'index.js'));
-console.log(`\n  AI usage dashboard is on ${url}\n`);
+console.log(`\n  Token usage dashboard is on ${url}\n`);
 
 const wantsBrowser = flag('--open') || (process.stdout.isTTY && !flag('--no-open'));
 if (wantsBrowser) {

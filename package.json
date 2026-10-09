@@ -6,7 +6,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "prepublishOnly": "npm run build",
-    "start": "node bin/ai-usage-dashboard.js",
+    "start": "node bin/token-usage-dashboard.js",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
@@ -40,10 +40,10 @@
     "cost"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/NotAFlightRisk/ai-usage-dashboard",
-  "bugs": "https://github.com/NotAFlightRisk/ai-usage-dashboard/issues",
+  "homepage": "https://github.com/NotAFlightRisk/token-usage-dashboard",
+  "bugs": "https://github.com/NotAFlightRisk/token-usage-dashboard/issues",
   "bin": {
-    "aiusage": "bin/ai-usage-dashboard.js"
+    "aiusage": "bin/token-usage-dashboard.js"
   },
   "files": [
     "bin",
@@ -56,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NotAFlightRisk/ai-usage-dashboard.git"
+    "url": "git+https://github.com/NotAFlightRisk/token-usage-dashboard.git"
   },
   "imports": {
     "#lib/*": "./src/lib/*"
